@@ -1,5 +1,6 @@
 const http = require('http');
 const fs = require('fs');
+const path = require('path');
 const port = 4000;
 
 const server = http.createServer((req, res) => {
@@ -7,14 +8,20 @@ const server = http.createServer((req, res) => {
     if(req.method === 'GET')
     {
         let filePath = '';
-        res.writeHead(200, { "Content-Type": "text/html" });
+        let contentType = '';
 
         if (req.url === '/') {
             filePath = 'index.html';
+            contentType = 'text/html';
         } else if (req.url === '/euro') {
             filePath = 'euro24.html';
+            contentType = 'text/html';
         } else if (req.url === '/wc-t20') {
             filePath = 'world-cup-t20.html';
+            contentType = 'text/html';
+        } else if (req.url === '/styles.css') {
+            filePath = 'styles.css';
+            contentType = 'text/css';
         } else {
             res.writeHead(404, { "Content-Type": "text/plain" });
             res.write("404 Page Not Found");
@@ -31,6 +38,7 @@ const server = http.createServer((req, res) => {
                 return;
             }
 
+            res.writeHead(200, { "Content-Type": contentType });
             res.write(data);
             res.end();
         });
@@ -39,12 +47,13 @@ const server = http.createServer((req, res) => {
     else if( req.method === 'POST'  &&  req.url === '/euro')
     {
         let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
+        req.on('data', (data) => {
+            body += data.toString();
         });
 
         req.on('end', () => {
             const formData = new URLSearchParams(body);
+            console.log(formData);
             const matchup = formData.get('matchup');
             const date = formData.get('date');
 
